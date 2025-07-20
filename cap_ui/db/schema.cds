@@ -50,4 +50,9 @@ entity ODataServices {
   active           : Boolean default true;
   created_at       : Timestamp;
   last_updated     : Timestamp;
+
+  actions {
+    refreshMetadata;
+    toggleActive;
+  }
 }
