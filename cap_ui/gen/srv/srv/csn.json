@@ -93,18 +93,6 @@
           },
           "Label": "OData Version"
         },
-        {
-          "$Type": "UI.DataFieldForAction",
-          "Action": "AdminService.ODataServices_refreshMetadata",
-          "Label": "Refresh Metadata",
-          "Hidden": {
-            "xpr": [
-              "not",
-              "IsActiveEntity"
-            ]
-          },
-          "RequiresContext": true
-        }
       ],
       "elements": {
         "ID": {
@@ -251,18 +239,6 @@
           },
           "Label": "OData Version"
         },
-        {
-          "$Type": "UI.DataFieldForAction",
-          "Action": "AdminService.ODataServices_refreshMetadata",
-          "Label": "Refresh Metadata",
-          "Hidden": {
-            "xpr": [
-              "not",
-              "IsActiveEntity"
-            ]
-          },
-          "RequiresContext": true
-        }
       ],
       "projection": {
         "from": {
@@ -318,11 +294,7 @@
           "type": "cds.Timestamp"
         }
       },
-      "actions": {
-        "refreshMetadata": {
-          "kind": "action"
-        }
-      }
+      "actions": {}
     }
   },
   "meta": {

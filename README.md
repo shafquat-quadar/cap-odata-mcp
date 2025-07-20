@@ -28,6 +28,6 @@ metadata.
 
 For a quick test use the public Northwind OData endpoint. Create a new record in
 the CAP admin UI with the base URL `https://services.odata.org` and the service
-name `northwind/northwind.svc`. After saving the record execute the
-`refreshMetadata` action. The metadata JSON will be stored in the database and
-the `odata_version` column will indicate whether the service is v2 or v4.
+name `northwind/northwind.svc`. After saving the record the service metadata is
+automatically fetched and stored in the database. The `odata_version` column
+will indicate whether the service is v2 or v4.

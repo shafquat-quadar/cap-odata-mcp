@@ -28,14 +28,7 @@ namespace db;
     { Value: active,           Label: 'Active' },
     { Value: created_at,       Label: 'Created At' },
     { Value: last_updated,     Label: 'Last Updated' },
-    { Value: odata_version,    Label: 'OData Version' },
-    {
-      $Type  : 'UI.DataFieldForAction',
-      Action : 'AdminService.ODataServices_refreshMetadata',
-      Label  : 'Refresh Metadata',
-    Hidden : { xpr: ['not', 'IsActiveEntity'] },
-      RequiresContext : true
-    }
+    { Value: odata_version,    Label: 'OData Version' }
   ]
 }
 entity ODataServices {
