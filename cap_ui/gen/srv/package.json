@@ -7,18 +7,18 @@
     "build": "cds build"
   },
   "dependencies": {
-    "@sap/cds": "^7",
-    "sqlite3": "^5",
-    "node-fetch": "^2",
-    "xml2js": "^0.6"
+    "@sap/cds": "^8.9.4",
+    "sqlite3": "^5"
   },
   "cds": {
     "requires": {
-    "db":{
-      "kind": "sqlite",
-      "credentials": {
-        "database": "../shared.sqlite"
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "database": "../shared.sqlite"
+        }
       }
     }
-  }}
+
+  }
 }

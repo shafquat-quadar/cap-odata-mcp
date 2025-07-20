@@ -1,0 +1,164 @@
+{
+  "namespace": "db",
+  "definitions": {
+    "db.ODataServices": {
+      "kind": "entity",
+      "@Capabilities.InsertRestrictions.Insertable": true,
+      "@Capabilities.UpdateRestrictions.Updatable": true,
+      "@Capabilities.DeleteRestrictions.Deletable": true,
+      "@UI.HeaderInfo.TypeNamePlural": "OData Services",
+      "@UI.HeaderInfo.TypeName": "OData Service",
+      "@UI.HeaderInfo.Title.Value": {
+        "=": "service_url"
+      },
+      "@UI.LineItem": [
+        {
+          "Value": {
+            "=": "service_url"
+          },
+          "Label": "Service URL"
+        },
+        {
+          "Value": {
+            "=": "version_hash"
+          },
+          "Label": "Version Hash"
+        },
+        {
+          "Value": {
+            "=": "active"
+          },
+          "Label": "Active"
+        },
+        {
+          "Value": {
+            "=": "created_at"
+          },
+          "Label": "Created At"
+        },
+        {
+          "Value": {
+            "=": "last_updated"
+          },
+          "Label": "Last Updated"
+        }
+      ],
+      "elements": {
+        "ID": {
+          "@UI.Hidden": true,
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "service_url": {
+          "type": "cds.String"
+        },
+        "metadata_json": {
+          "type": "cds.LargeString"
+        },
+        "version_hash": {
+          "type": "cds.String"
+        },
+        "active": {
+          "type": "cds.Boolean",
+          "default": {
+            "val": true
+          }
+        },
+        "created_at": {
+          "type": "cds.Timestamp"
+        },
+        "last_updated": {
+          "type": "cds.Timestamp"
+        }
+      }
+    },
+    "AdminService": {
+      "@source": "srv/service.cds",
+      "kind": "service"
+    },
+    "AdminService.ODataServices": {
+      "kind": "entity",
+      "@odata.draft.enabled": true,
+      "@Capabilities.InsertRestrictions.Insertable": true,
+      "@Capabilities.UpdateRestrictions.Updatable": true,
+      "@Capabilities.DeleteRestrictions.Deletable": true,
+      "@UI.HeaderInfo.TypeNamePlural": "OData Services",
+      "@UI.HeaderInfo.TypeName": "OData Service",
+      "@UI.HeaderInfo.Title.Value": {
+        "=": "service_url"
+      },
+      "@UI.LineItem": [
+        {
+          "Value": {
+            "=": "service_url"
+          },
+          "Label": "Service URL"
+        },
+        {
+          "Value": {
+            "=": "version_hash"
+          },
+          "Label": "Version Hash"
+        },
+        {
+          "Value": {
+            "=": "active"
+          },
+          "Label": "Active"
+        },
+        {
+          "Value": {
+            "=": "created_at"
+          },
+          "Label": "Created At"
+        },
+        {
+          "Value": {
+            "=": "last_updated"
+          },
+          "Label": "Last Updated"
+        }
+      ],
+      "projection": {
+        "from": {
+          "ref": [
+            "db.ODataServices"
+          ]
+        }
+      },
+      "elements": {
+        "ID": {
+          "@UI.Hidden": true,
+          "key": true,
+          "type": "cds.UUID"
+        },
+        "service_url": {
+          "type": "cds.String"
+        },
+        "metadata_json": {
+          "type": "cds.LargeString"
+        },
+        "version_hash": {
+          "type": "cds.String"
+        },
+        "active": {
+          "type": "cds.Boolean",
+          "default": {
+            "val": true
+          }
+        },
+        "created_at": {
+          "type": "cds.Timestamp"
+        },
+        "last_updated": {
+          "type": "cds.Timestamp"
+        }
+      }
+    }
+  },
+  "meta": {
+    "creator": "CDS Compiler v5.9.8",
+    "flavor": "inferred"
+  },
+  "$version": "2.0"
+}

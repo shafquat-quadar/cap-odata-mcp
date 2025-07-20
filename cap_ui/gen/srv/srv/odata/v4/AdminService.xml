@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="4.0" xmlns:edmx="http://docs.oasis-open.org/odata/ns/edmx">
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Capabilities.V1.xml">
+    <edmx:Include Alias="Capabilities" Namespace="Org.OData.Capabilities.V1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/Common.xml">
+    <edmx:Include Alias="Common" Namespace="com.sap.vocabularies.Common.v1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://oasis-tcs.github.io/odata-vocabularies/vocabularies/Org.OData.Core.V1.xml">
+    <edmx:Include Alias="Core" Namespace="Org.OData.Core.V1"/>
+  </edmx:Reference>
+  <edmx:Reference Uri="https://sap.github.io/odata-vocabularies/vocabularies/UI.xml">
+    <edmx:Include Alias="UI" Namespace="com.sap.vocabularies.UI.v1"/>
+  </edmx:Reference>
+  <edmx:DataServices>
+    <Schema Namespace="AdminService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
+      <Annotation Term="Core.Links">
+        <Collection>
+          <Record>
+            <PropertyValue Property="rel" String="author"/>
+            <PropertyValue Property="href" String="https://cap.cloud.sap"/>
+          </Record>
+        </Collection>
+      </Annotation>
+      <EntityContainer Name="EntityContainer">
+        <EntitySet Name="ODataServices" EntityType="AdminService.ODataServices">
+          <NavigationPropertyBinding Path="SiblingEntity" Target="ODataServices"/>
+        </EntitySet>
+      </EntityContainer>
+      <EntityType Name="ODataServices">
+        <Key>
+          <PropertyRef Name="ID"/>
+          <PropertyRef Name="IsActiveEntity"/>
+        </Key>
+        <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
+        <Property Name="service_url" Type="Edm.String"/>
+        <Property Name="metadata_json" Type="Edm.String"/>
+        <Property Name="version_hash" Type="Edm.String"/>
+        <Property Name="active" Type="Edm.Boolean" DefaultValue="true"/>
+        <Property Name="created_at" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="last_updated" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="IsActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="true"/>
+        <Property Name="HasActiveEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false"/>
+        <Property Name="HasDraftEntity" Type="Edm.Boolean" Nullable="false" DefaultValue="false"/>
+        <NavigationProperty Name="DraftAdministrativeData" Type="AdminService.DraftAdministrativeData" ContainsTarget="true"/>
+        <NavigationProperty Name="SiblingEntity" Type="AdminService.ODataServices"/>
+      </EntityType>
+      <EntityType Name="DraftAdministrativeData">
+        <Key>
+          <PropertyRef Name="DraftUUID"/>
+        </Key>
+        <Property Name="DraftUUID" Type="Edm.Guid" Nullable="false"/>
+        <Property Name="CreationDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="CreatedByUser" Type="Edm.String" MaxLength="256"/>
+        <Property Name="DraftIsCreatedByMe" Type="Edm.Boolean"/>
+        <Property Name="LastChangeDateTime" Type="Edm.DateTimeOffset" Precision="7"/>
+        <Property Name="LastChangedByUser" Type="Edm.String" MaxLength="256"/>
+        <Property Name="InProcessByUser" Type="Edm.String" MaxLength="256"/>
+        <Property Name="DraftIsProcessedByMe" Type="Edm.Boolean"/>
+      </EntityType>
+      <Action Name="draftPrepare" IsBound="true" EntitySetPath="in">
+        <Parameter Name="in" Type="AdminService.ODataServices"/>
+        <Parameter Name="SideEffectsQualifier" Type="Edm.String"/>
+        <ReturnType Type="AdminService.ODataServices"/>
+      </Action>
+      <Action Name="draftActivate" IsBound="true" EntitySetPath="in">
+        <Parameter Name="in" Type="AdminService.ODataServices"/>
+        <ReturnType Type="AdminService.ODataServices"/>
+      </Action>
+      <Action Name="draftEdit" IsBound="true" EntitySetPath="in">
+        <Parameter Name="in" Type="AdminService.ODataServices"/>
+        <Parameter Name="PreserveChanges" Type="Edm.Boolean"/>
+        <ReturnType Type="AdminService.ODataServices"/>
+      </Action>
+      <Annotations Target="AdminService.ODataServices">
+        <Annotation Term="UI.HeaderInfo">
+          <Record Type="UI.HeaderInfoType">
+            <PropertyValue Property="TypeNamePlural" String="OData Services"/>
+            <PropertyValue Property="TypeName" String="OData Service"/>
+            <PropertyValue Property="Title">
+              <Record Type="UI.DataField">
+                <PropertyValue Property="Value" Path="service_url"/>
+              </Record>
+            </PropertyValue>
+          </Record>
+        </Annotation>
+        <Annotation Term="UI.LineItem">
+          <Collection>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="service_url"/>
+              <PropertyValue Property="Label" String="Service URL"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="version_hash"/>
+              <PropertyValue Property="Label" String="Version Hash"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="active"/>
+              <PropertyValue Property="Label" String="Active"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="created_at"/>
+              <PropertyValue Property="Label" String="Created At"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="last_updated"/>
+              <PropertyValue Property="Label" String="Last Updated"/>
+            </Record>
+          </Collection>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="AdminService.EntityContainer/ODataServices">
+        <Annotation Term="Capabilities.InsertRestrictions">
+          <Record Type="Capabilities.InsertRestrictionsType">
+            <PropertyValue Property="Insertable" Bool="true"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.UpdateRestrictions">
+          <Record Type="Capabilities.UpdateRestrictionsType">
+            <PropertyValue Property="Updatable" Bool="true"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Capabilities.DeleteRestrictions">
+          <Record Type="Capabilities.DeleteRestrictionsType">
+            <PropertyValue Property="Deletable" Bool="true"/>
+          </Record>
+        </Annotation>
+        <Annotation Term="Common.DraftRoot">
+          <Record Type="Common.DraftRootType">
+            <PropertyValue Property="ActivationAction" String="AdminService.draftActivate"/>
+            <PropertyValue Property="EditAction" String="AdminService.draftEdit"/>
+            <PropertyValue Property="PreparationAction" String="AdminService.draftPrepare"/>
+          </Record>
+        </Annotation>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/ID">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+        <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/IsActiveEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/HasActiveEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/HasDraftEntity">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/DraftAdministrativeData">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData">
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftAdministrativeData}"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/DraftUUID">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftUUID}"/>
+        <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/CreationDateTime">
+        <Annotation Term="Common.Label" String="{i18n>Draft_CreationDateTime}"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/CreatedByUser">
+        <Annotation Term="Common.Label" String="{i18n>Draft_CreatedByUser}"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/DraftIsCreatedByMe">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftIsCreatedByMe}"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/LastChangeDateTime">
+        <Annotation Term="Common.Label" String="{i18n>Draft_LastChangeDateTime}"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/LastChangedByUser">
+        <Annotation Term="Common.Label" String="{i18n>Draft_LastChangedByUser}"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/InProcessByUser">
+        <Annotation Term="Common.Label" String="{i18n>Draft_InProcessByUser}"/>
+      </Annotations>
+      <Annotations Target="AdminService.DraftAdministrativeData/DraftIsProcessedByMe">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+        <Annotation Term="Common.Label" String="{i18n>Draft_DraftIsProcessedByMe}"/>
+      </Annotations>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>
