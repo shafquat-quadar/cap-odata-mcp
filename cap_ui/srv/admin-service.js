@@ -113,62 +113,6 @@ module.exports = srv => {
     }
   });
 
-  srv.on('refreshMetadata', async req => {
-    const ID =
-      req.data?.ID ||
-      (Array.isArray(req.data?.IDs) && req.data.IDs[0]) ||
-      (req.params?.[0] && req.params[0].ID);
-    if (!ID) return req.error(400, 'Service ID required');
-
-    if (req.data?.IsActiveEntity === false) {
-      return req.error(400, 'Please save the draft before refreshing metadata.');
-    }
-
-    const tx = srv.tx(req);
-    const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
-    if (!service) return req.error(404, 'Service not found');
-    try {
-      const { json, version, url } = await fetchMetadata(
-        service.service_base_url,
-        service.service_name
-      );
-      req.info(`Fetched metadata from ${url}`);
-      await tx.run(
-        UPDATE(ODataServices, ID).set({
-          metadata_json: json,
-          odata_version: version,
-          last_updated: new Date()
-        })
-      );
-      req.info('Metadata refreshed successfully');
-      return { message: `Metadata refreshed from ${url}` };
-    } catch (e) {
-      return req.error(500, e.message);
-    }
-  });
-
-  srv.on('toggleActive', async req => {
-    const { ID } = req.params[0];
-    const tx = srv.tx(req);
-    const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
-    if (!service) return req.error(404, 'Service not found');
-    try {
-      const { json, version, url } = await fetchMetadata(
-        service.service_base_url,
-        service.service_name
-      );
-      req.info(`Fetched metadata from ${url}`);
-      await tx.run(
-        UPDATE(ODataServices, ID).set({
-          metadata_json: json,
-          odata_version: version,
-          last_updated: new Date()
-        })
-      );
-      req.info('Metadata refreshed successfully');
-      return tx.run(SELECT.one.from(ODataServices).where({ ID }));
-    } catch (e) {
-      return req.error(500, e.message);
-    }
-  });
+  // Manual refresh and toggle actions have been removed. Metadata is now
+  // fetched automatically during create or update operations.
 };

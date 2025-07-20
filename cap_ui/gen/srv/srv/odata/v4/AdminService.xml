@@ -51,9 +51,6 @@
         <Property Name="InProcessByUser" Type="Edm.String" MaxLength="256"/>
         <Property Name="DraftIsProcessedByMe" Type="Edm.Boolean"/>
       </EntityType>
-      <Action Name="refreshMetadata" IsBound="true">
-        <Parameter Name="in" Type="AdminService.ODataServices"/>
-      </Action>
       <Action Name="draftPrepare" IsBound="true" EntitySetPath="in">
         <Parameter Name="in" Type="AdminService.ODataServices"/>
         <Parameter Name="SideEffectsQualifier" Type="Edm.String"/>
@@ -141,21 +138,6 @@
             <Record Type="UI.DataField">
               <PropertyValue Property="Value" Path="odata_version"/>
               <PropertyValue Property="Label" String="OData Version"/>
-            </Record>
-            <Record Type="UI.DataFieldForAction">
-              <PropertyValue Property="Action" String="AdminService.ODataServices_refreshMetadata"/>
-              <PropertyValue Property="Label" String="Refresh Metadata"/>
-              <PropertyValue Property="Hidden">
-                <Record>
-                  <PropertyValue Property="xpr">
-                    <Collection>
-                      <String>not</String>
-                      <String>IsActiveEntity</String>
-                    </Collection>
-                  </PropertyValue>
-                </Record>
-              </PropertyValue>
-              <PropertyValue Property="RequiresContext" Bool="true"/>
             </Record>
           </Collection>
         </Annotation>
