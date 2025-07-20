@@ -10,8 +10,10 @@ class MetadataStore:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         cur = conn.execute(
-            "SELECT service_url, metadata_json FROM odata_services WHERE active = 1"
+            "SELECT base_url, service_name, metadata_json FROM odata_services WHERE active = 1"
         )
         rows = [dict(row) for row in cur.fetchall()]
+        for row in rows:
+            row["service_url"] = row["service_name"]
         conn.close()
         return rows
