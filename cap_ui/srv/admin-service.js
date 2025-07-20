@@ -46,6 +46,7 @@ function extractEntities(parsed) {
 
 async function fetchMetadata(baseUrl, serviceName) {
   const url = buildMetadataUrl(baseUrl, serviceName);
+  console.log(`Fetching metadata from ${url}`);
   const res = await fetch(url, { headers: AUTH_HEADER });
   if (!res.ok) {
     throw new Error(`Failed to fetch metadata from ${url}: ${res.status} ${res.statusText}`);
@@ -78,8 +79,7 @@ async function parseVersion(xml) {
 module.exports = srv => {
   const { ODataServices } = srv.entities;
 
-
-  srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
+  async function applyMetadata(req) {
     try {
       if (
         !req.data.metadata_json &&
@@ -108,10 +108,13 @@ module.exports = srv => {
       req.error(500, e.message);
     }
     req.data.last_updated = new Date();
-    if (req.event === 'CREATE' || req.event === 'NEW') {
+    if (req.event === 'CREATE') {
       req.data.created_at = new Date();
     }
-  });
+  }
+
+  srv.before('CREATE', ODataServices, applyMetadata);
+  srv.before('PATCH', ODataServices, applyMetadata);
 
   // Manual refresh and toggle actions have been removed. Metadata is now
   // fetched automatically during create or update operations.
