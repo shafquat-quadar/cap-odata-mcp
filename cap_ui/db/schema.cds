@@ -26,10 +26,10 @@ namespace db;
   ]
 }
 entity ODataServices {
-  @UI.Hidden
+  @UI.Hidden: true
   key ID           : UUID;
   service_url      : String;
-  @UI.Hidden
+  @UI.Hidden: true
   metadata_json    : LargeString;
   @UI.Identification
   @UI.LineItem
@@ -40,4 +40,8 @@ entity ODataServices {
   active           : Boolean default true;
   created_at       : Timestamp;
   last_updated     : Timestamp;
+  actions {
+    action refreshMetadata();
+    action toggleActive();
+  }
 }
