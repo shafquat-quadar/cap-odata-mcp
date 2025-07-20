@@ -11,34 +11,17 @@ module.exports = srv => {
     return crypto.createHash('md5').update(data).digest('hex');
   }
 
-  async function fetchMetadata(url) {
-    const metaUrl = url.replace(/\/$/, '') + '/$metadata';
-    const res = await fetch(metaUrl);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch metadata from ${metaUrl}`);
-    }
-    const xml = await res.text();
-    const match = xml.match(/<edmx:Edmx[^>]*Version="([^"]+)"/i);
-    const version = match && match[1].startsWith('4') ? 'v4' : 'v2';
-    const parsed = await xml2js.parseStringPromise(xml, { explicitArray: false });
-    return { json: JSON.stringify(parsed), version };
-  }
-
-  srv.before(['CREATE', 'UPDATE'], ODataServices, async req => {
-    if (!req.data.metadata_json && req.data.service_url) {
-      try {
-        const { json, version } = await fetchMetadata(req.data.service_url);
-        req.data.metadata_json = json;
-        req.data.odata_version = version;
-      } catch (e) {
-        req.warn(`Failed to fetch metadata: ${e.message}`);
-      }
-    }
+  srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
     if (req.data.metadata_json) {
       req.data.version_hash = computeHash(req.data.metadata_json);
+    } else if (req.data.service_url) {
+      const { json, version } = await fetchMetadata(req.data.service_url);
+      req.data.metadata_json = json;
+      req.data.version_hash = computeHash(json);
+      req.data.odata_version = version;
     }
     req.data.last_updated = new Date();
-    if (req.event === 'CREATE' && !req.data.created_at) {
+    if ((req.event === 'CREATE' || req.event === 'NEW') && !req.data.created_at) {
       req.data.created_at = new Date();
     }
   });
