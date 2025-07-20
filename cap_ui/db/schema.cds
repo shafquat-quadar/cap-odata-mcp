@@ -33,7 +33,7 @@ namespace db;
       $Type  : 'UI.DataFieldForAction',
       Action : 'AdminService.ODataServices_refreshMetadata',
       Label  : 'Refresh Metadata',
-      Hidden : { $Path: 'IsActiveEntity' },
+      Hidden : { '=': [ { $Path: 'IsActiveEntity' }, false ] },
       RequiresContext : true
     }
   ]
