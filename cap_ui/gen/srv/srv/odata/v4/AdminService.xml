@@ -35,7 +35,6 @@
         <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
         <Property Name="service_url" Type="Edm.String"/>
         <Property Name="metadata_json" Type="Edm.String"/>
-        <Property Name="version_hash" Type="Edm.String"/>
         <Property Name="active" Type="Edm.Boolean" DefaultValue="true"/>
         <Property Name="created_at" Type="Edm.DateTimeOffset" Precision="7"/>
         <Property Name="last_updated" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -89,10 +88,6 @@
             <Record Type="UI.DataField">
               <PropertyValue Property="Value" Path="service_url"/>
               <PropertyValue Property="Label" String="Service URL"/>
-            </Record>
-            <Record Type="UI.DataField">
-              <PropertyValue Property="Value" Path="version_hash"/>
-              <PropertyValue Property="Label" String="Version Hash"/>
             </Record>
             <Record Type="UI.DataField">
               <PropertyValue Property="Value" Path="active"/>

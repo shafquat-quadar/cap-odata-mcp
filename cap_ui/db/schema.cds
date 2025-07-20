@@ -17,7 +17,6 @@ namespace db;
   LineItem: [
     { Value: service_url,   Label: 'Service URL' },
     { Value: odata_version, Label: 'OData Version' },
-    { Value: version_hash,  Label: 'Version Hash' },
     { Value: active,        Label: 'Active' },
     { Value: created_at,    Label: 'Created At' },
     { Value: last_updated,  Label: 'Last Updated' },
@@ -28,7 +27,6 @@ namespace db;
     }
   ],
   Identification: [
-    { Value: version_hash,  Label: 'Version Hash' },
     { Value: active,        Label: 'Active' },
     { Value: created_at,    Label: 'Created At' },
     { Value: last_updated,  Label: 'Last Updated' },
@@ -44,11 +42,10 @@ entity ODataServices {
   @UI.Identification
   @UI.LineItem
   odata_version    : String;
-  @UI.Identification
-  @UI.LineItem
-  version_hash     : String;
   active           : Boolean default true;
+  @Core.Computed: true
   created_at       : Timestamp;
+  @Core.Computed: true
   last_updated     : Timestamp;
 }
 
