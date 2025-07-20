@@ -11,7 +11,7 @@ namespace db;
   },
   Facets: [{
       $Type : 'UI.ReferenceFacet',
-      Label : 'Details',
+      Label : 'Service Name',
       Target: '@UI.Identification'
   }],
   LineItem: [
@@ -28,16 +28,20 @@ namespace db;
     }
   ],
   Identification: [
-    { Value: active,        Label: 'Active' },
-    { Value: created_at,    Label: 'Created At' },
-    { Value: last_updated,  Label: 'Last Updated' },
-    { Value: odata_version, Label: 'OData Version' }
+    { Value: service_base_url, Label: 'Base URL' },
+    { Value: service_name,     Label: 'Service Name' },
+    { Value: active,           Label: 'Active' },
+    { Value: created_at,       Label: 'Created At' },
+    { Value: last_updated,     Label: 'Last Updated' },
+    { Value: odata_version,    Label: 'OData Version' }
   ]
 }
 entity ODataServices {
   @UI.Hidden: true
   key ID           : UUID;
+  @UI.Identification
   service_base_url : String;
+  @UI.Identification
   service_name     : String;
   @UI.Hidden: true
   metadata_json    : LargeString;
