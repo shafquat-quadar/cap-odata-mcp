@@ -21,5 +21,8 @@
         "database": "../shared.sqlite"
       }
     }
-  }}
+  }},
+  "devDependencies": {
+    "@sap/cds-dk": "^8.9.7"
+  }
 }
