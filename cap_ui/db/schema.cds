@@ -11,17 +11,31 @@ namespace db;
   },
   LineItem: [
     { Value: service_url,   Label: 'Service URL' },
+    { Value: odata_version, Label: 'OData Version' },
     { Value: version_hash,  Label: 'Version Hash' },
     { Value: active,        Label: 'Active' },
     { Value: created_at,    Label: 'Created At' },
     { Value: last_updated,  Label: 'Last Updated' }
+  ],
+  Identification: [
+    { Value: version_hash,  Label: 'Version Hash' },
+    { Value: active,        Label: 'Active' },
+    { Value: created_at,    Label: 'Created At' },
+    { Value: last_updated,  Label: 'Last Updated' },
+    { Value: odata_version, Label: 'OData Version' }
   ]
 }
 entity ODataServices {
   @UI.Hidden
   key ID           : UUID;
   service_url      : String;
+  @UI.Hidden
   metadata_json    : LargeString;
+  @UI.Identification
+  @UI.LineItem
+  odata_version    : String;
+  @UI.Identification
+  @UI.LineItem
   version_hash     : String;
   active           : Boolean default true;
   created_at       : Timestamp;
