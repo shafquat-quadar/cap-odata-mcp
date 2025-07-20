@@ -43,7 +43,12 @@ entity ODataServices {
   @UI.LineItem
   odata_version    : String;
   active           : Boolean default true;
-  created_at       : Timestamp @readonly default $now;
-  last_updated     : Timestamp @readonly;
+  @Core.Computed
+  @cds.on.insert : $now
+  created_at       : Timestamp;
+  @Core.Computed
+  @cds.on.insert : $now
+  @cds.on.update : $now
+  last_updated     : Timestamp;
 }
 
