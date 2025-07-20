@@ -1,4 +1,3 @@
-import json
 import sqlite3
 import tempfile
 from pathlib import Path
@@ -9,7 +8,16 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
-SAMPLE_METADATA = json.dumps({"entities": [{"name": "Products"}]})
+SAMPLE_METADATA = """<?xml version='1.0' encoding='utf-8'?>
+<edmx:Edmx xmlns:edmx='http://docs.oasis-open.org/odata/ns/edmx' Version='4.0'>
+  <edmx:DataServices>
+    <Schema Namespace='Test' xmlns='http://docs.oasis-open.org/odata/ns/edm'>
+      <EntityContainer Name='Container'>
+        <EntitySet Name='Products' EntityType='Test.Product'/>
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>"""
 
 
 def setup_db(path: str):
@@ -19,13 +27,14 @@ def setup_db(path: str):
             id TEXT,
             service_base_url TEXT,
             service_name TEXT,
-            metadata_json TEXT,
+            metadata TEXT,
+            description TEXT,
             active INTEGER
         )"""
     )
     conn.execute(
-        "INSERT INTO odata_services VALUES (?,?,?,?,1)",
-        ("1", "http://example.com", "demo", SAMPLE_METADATA),
+        "INSERT INTO odata_services VALUES (?,?,?,?,?,1)",
+        ("1", "http://example.com", "demo", SAMPLE_METADATA, "Demo"),
     )
     conn.commit()
     conn.close()

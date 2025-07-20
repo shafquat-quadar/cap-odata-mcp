@@ -14,21 +14,20 @@ namespace db;
       Label : 'Service Name',
       Target: '@UI.Identification'
   }],
-  LineItem: [
-    { Value: service_base_url, Label: 'Base URL' },
-    { Value: service_name,     Label: 'Service Name' },
-    { Value: odata_version,    Label: 'OData Version' },
-    { Value: active,        Label: 'Active' },
-    { Value: created_at,    Label: 'Created At' },
-    { Value: last_updated,  Label: 'Last Updated' }
-  ],
+    LineItem: [
+      { Value: service_base_url, Label: 'Base URL' },
+      { Value: service_name,     Label: 'Service Name' },
+      { Value: active,        Label: 'Active' },
+      { Value: created_at,    Label: 'Created At' },
+      { Value: last_updated,  Label: 'Last Updated' }
+    ],
   Identification: [
     { Value: service_base_url, Label: 'Base URL' },
     { Value: service_name,     Label: 'Service Name' },
     { Value: active,           Label: 'Active' },
     { Value: created_at,       Label: 'Created At' },
-    { Value: last_updated,     Label: 'Last Updated' },
-    { Value: odata_version,    Label: 'OData Version' }
+      { Value: last_updated,     Label: 'Last Updated' },
+      { Value: description,      Label: 'Description' }
   ]
 }
 entity ODataServices {
@@ -39,10 +38,9 @@ entity ODataServices {
   @UI.Identification
   service_name     : String;
   @UI.Hidden: true
-  metadata_json    : LargeString;
+  metadata         : LargeString;
   @UI.Identification
-  @UI.LineItem
-  odata_version    : String;
+  description      : String;
   active           : Boolean default true;
   @Core.Computed
   @cds.on.insert : $now
