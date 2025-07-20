@@ -25,7 +25,7 @@ def setup_db(path: str):
     )
     conn.execute(
         "INSERT INTO odata_services VALUES (?,?,?,?,1)",
-        ("1", "root", "demo", SAMPLE_METADATA),
+        ("1", "http://example.com", "demo", SAMPLE_METADATA),
     )
     conn.commit()
     conn.close()
