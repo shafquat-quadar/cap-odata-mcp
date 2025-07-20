@@ -120,7 +120,7 @@ module.exports = srv => {
       (req.params?.[0] && req.params[0].ID);
     if (!ID) return req.error(400, 'Service ID required');
 
-    if (req.params?.[0]?.IsActiveEntity === false) {
+    if (req.data?.IsActiveEntity === false) {
       return req.error(400, 'Please save the draft before refreshing metadata.');
     }
 
