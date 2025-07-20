@@ -120,6 +120,10 @@ module.exports = srv => {
       (req.params?.[0] && req.params[0].ID);
     if (!ID) return req.error(400, 'Service ID required');
 
+    if (req.data?.IsActiveEntity === false) {
+      return req.error(400, 'Please save the draft before refreshing metadata.');
+    }
+
     const tx = srv.tx(req);
     const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
     if (!service) return req.error(404, 'Service not found');
@@ -137,7 +141,7 @@ module.exports = srv => {
         })
       );
       req.info('Metadata refreshed successfully');
-      return tx.run(SELECT.one.from(ODataServices).where({ ID }));
+      return { message: `Metadata refreshed from ${url}` };
     } catch (e) {
       return req.error(500, e.message);
     }
