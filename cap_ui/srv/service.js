@@ -1,6 +1,8 @@
 const cds = require('@sap/cds');
 const { UPDATE } = cds.ql;
 const fetch = require('node-fetch');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 
 /**
@@ -18,7 +20,16 @@ function buildUrl(base, service) {
 async function fetchMetadata(baseUrl, serviceName) {
   const url = buildUrl(baseUrl, serviceName);
   console.log(`Fetching metadata from ${url}`);
-  const res = await fetch(url);
+
+  const user = process.env.SAP_USER || process.env.ODATA_USER;
+  const pass = process.env.SAP_PASS || process.env.ODATA_PASSWORD;
+  const headers = {};
+  if (user && pass) {
+    const token = Buffer.from(`${user}:${pass}`).toString('base64');
+    headers['Authorization'] = `Basic ${token}`;
+  }
+
+  const res = await fetch(url, { headers });
   if (!res.ok) {
     throw new Error(`Failed to fetch metadata: ${res.status} ${res.statusText}`);
   }
