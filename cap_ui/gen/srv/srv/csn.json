@@ -20,12 +20,6 @@
         },
         {
           "Value": {
-            "=": "version_hash"
-          },
-          "Label": "Version Hash"
-        },
-        {
-          "Value": {
             "=": "active"
           },
           "Label": "Active"
@@ -54,9 +48,6 @@
         },
         "metadata_json": {
           "type": "cds.LargeString"
-        },
-        "version_hash": {
-          "type": "cds.String"
         },
         "active": {
           "type": "cds.Boolean",
@@ -96,12 +87,6 @@
         },
         {
           "Value": {
-            "=": "version_hash"
-          },
-          "Label": "Version Hash"
-        },
-        {
-          "Value": {
             "=": "active"
           },
           "Label": "Active"
@@ -137,9 +122,6 @@
         },
         "metadata_json": {
           "type": "cds.LargeString"
-        },
-        "version_hash": {
-          "type": "cds.String"
         },
         "active": {
           "type": "cds.Boolean",
