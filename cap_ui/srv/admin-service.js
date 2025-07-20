@@ -114,13 +114,15 @@ module.exports = srv => {
   });
 
   srv.on('refreshMetadata', async req => {
-    const ID = req.params?.[0]?.ID || req.data?.ID;
-    if (!ID) return req.error(400, 'No service ID provided');
+    const ID =
+      req.data?.ID ||
+      (Array.isArray(req.data?.IDs) && req.data.IDs[0]) ||
+      (req.params?.[0] && req.params[0].ID);
+    if (!ID) return req.error(400, 'Service ID required');
 
     const tx = srv.tx(req);
     const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
     if (!service) return req.error(404, 'Service not found');
-
     try {
       const { json, version, url } = await fetchMetadata(
         service.service_base_url,
@@ -134,11 +136,10 @@ module.exports = srv => {
           last_updated: new Date()
         })
       );
-      req.info(`Metadata refreshed for ${service.service_name}`);
-      return { ID, status: 'success' };
+      req.info('Metadata refreshed successfully');
+      return tx.run(SELECT.one.from(ODataServices).where({ ID }));
     } catch (e) {
-      req.error(e.message);
-      return { ID, status: 'failed', message: e.message };
+      return req.error(500, e.message);
     }
   });
 
