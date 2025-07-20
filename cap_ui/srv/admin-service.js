@@ -116,6 +116,21 @@ module.exports = srv => {
   srv.before('CREATE', ODataServices, applyMetadata);
   srv.before('PATCH', ODataServices, applyMetadata);
 
+  srv.on('draftActivate', ODataServices, async (req, next) => {
+    const result = await next();
+    await applyMetadata(req);
+    await cds.run(
+      UPDATE(ODataServices)
+        .set({
+          metadata_json: req.data.metadata_json,
+          odata_version: req.data.odata_version,
+          last_updated: req.data.last_updated,
+        })
+        .where({ ID: result.ID })
+    );
+    return result;
+  });
+
   // Manual refresh and toggle actions have been removed. Metadata is now
   // fetched automatically during create or update operations.
 };
