@@ -14,14 +14,6 @@
   </edmx:Reference>
   <edmx:DataServices>
     <Schema Namespace="AdminService" xmlns="http://docs.oasis-open.org/odata/ns/edm">
-      <Annotation Term="Core.Links">
-        <Collection>
-          <Record>
-            <PropertyValue Property="rel" String="author"/>
-            <PropertyValue Property="href" String="https://cap.cloud.sap"/>
-          </Record>
-        </Collection>
-      </Annotation>
       <EntityContainer Name="EntityContainer">
         <EntitySet Name="ODataServices" EntityType="AdminService.ODataServices">
           <NavigationPropertyBinding Path="SiblingEntity" Target="ODataServices"/>
@@ -33,8 +25,10 @@
           <PropertyRef Name="IsActiveEntity"/>
         </Key>
         <Property Name="ID" Type="Edm.Guid" Nullable="false"/>
-        <Property Name="service_url" Type="Edm.String"/>
+        <Property Name="service_base_url" Type="Edm.String"/>
+        <Property Name="service_name" Type="Edm.String"/>
         <Property Name="metadata_json" Type="Edm.String"/>
+        <Property Name="odata_version" Type="Edm.String"/>
         <Property Name="active" Type="Edm.Boolean" DefaultValue="true"/>
         <Property Name="created_at" Type="Edm.DateTimeOffset" Precision="7"/>
         <Property Name="last_updated" Type="Edm.DateTimeOffset" Precision="7"/>
@@ -57,6 +51,9 @@
         <Property Name="InProcessByUser" Type="Edm.String" MaxLength="256"/>
         <Property Name="DraftIsProcessedByMe" Type="Edm.Boolean"/>
       </EntityType>
+      <Action Name="refreshMetadata" IsBound="true">
+        <Parameter Name="in" Type="AdminService.ODataServices"/>
+      </Action>
       <Action Name="draftPrepare" IsBound="true" EntitySetPath="in">
         <Parameter Name="in" Type="AdminService.ODataServices"/>
         <Parameter Name="SideEffectsQualifier" Type="Edm.String"/>
@@ -78,16 +75,32 @@
             <PropertyValue Property="TypeName" String="OData Service"/>
             <PropertyValue Property="Title">
               <Record Type="UI.DataField">
-                <PropertyValue Property="Value" Path="service_url"/>
+                <PropertyValue Property="Value" Path="service_name"/>
               </Record>
             </PropertyValue>
           </Record>
         </Annotation>
+        <Annotation Term="UI.Facets">
+          <Collection>
+            <Record Type="UI.ReferenceFacet">
+              <PropertyValue Property="Label" String="Service Name"/>
+              <PropertyValue Property="Target" AnnotationPath="@UI.Identification"/>
+            </Record>
+          </Collection>
+        </Annotation>
         <Annotation Term="UI.LineItem">
           <Collection>
             <Record Type="UI.DataField">
-              <PropertyValue Property="Value" Path="service_url"/>
-              <PropertyValue Property="Label" String="Service URL"/>
+              <PropertyValue Property="Value" Path="service_base_url"/>
+              <PropertyValue Property="Label" String="Base URL"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="service_name"/>
+              <PropertyValue Property="Label" String="Service Name"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="odata_version"/>
+              <PropertyValue Property="Label" String="OData Version"/>
             </Record>
             <Record Type="UI.DataField">
               <PropertyValue Property="Value" Path="active"/>
@@ -100,6 +113,49 @@
             <Record Type="UI.DataField">
               <PropertyValue Property="Value" Path="last_updated"/>
               <PropertyValue Property="Label" String="Last Updated"/>
+            </Record>
+          </Collection>
+        </Annotation>
+        <Annotation Term="UI.Identification">
+          <Collection>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="service_base_url"/>
+              <PropertyValue Property="Label" String="Base URL"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="service_name"/>
+              <PropertyValue Property="Label" String="Service Name"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="active"/>
+              <PropertyValue Property="Label" String="Active"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="created_at"/>
+              <PropertyValue Property="Label" String="Created At"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="last_updated"/>
+              <PropertyValue Property="Label" String="Last Updated"/>
+            </Record>
+            <Record Type="UI.DataField">
+              <PropertyValue Property="Value" Path="odata_version"/>
+              <PropertyValue Property="Label" String="OData Version"/>
+            </Record>
+            <Record Type="UI.DataFieldForAction">
+              <PropertyValue Property="Action" String="AdminService.ODataServices_refreshMetadata"/>
+              <PropertyValue Property="Label" String="Refresh Metadata"/>
+              <PropertyValue Property="Hidden">
+                <Record>
+                  <PropertyValue Property="xpr">
+                    <Collection>
+                      <String>not</String>
+                      <String>IsActiveEntity</String>
+                    </Collection>
+                  </PropertyValue>
+                </Record>
+              </PropertyValue>
+              <PropertyValue Property="RequiresContext" Bool="true"/>
             </Record>
           </Collection>
         </Annotation>
@@ -131,6 +187,15 @@
       <Annotations Target="AdminService.ODataServices/ID">
         <Annotation Term="UI.Hidden" Bool="true"/>
         <Annotation Term="Core.ComputedDefaultValue" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/metadata_json">
+        <Annotation Term="UI.Hidden" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/created_at">
+        <Annotation Term="Core.Computed" Bool="true"/>
+      </Annotations>
+      <Annotations Target="AdminService.ODataServices/last_updated">
+        <Annotation Term="Core.Computed" Bool="true"/>
       </Annotations>
       <Annotations Target="AdminService.ODataServices/IsActiveEntity">
         <Annotation Term="UI.Hidden" Bool="true"/>
