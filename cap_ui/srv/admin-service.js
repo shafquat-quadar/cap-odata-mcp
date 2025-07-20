@@ -126,8 +126,35 @@ module.exports = srv => {
           last_updated: req.data.last_updated,
         })
         .where({ ID: data.ID })
-    );
-  });
+      );
+    });
+
+    // In managed draft mode PATCH isn't triggered on activation, so ensure
+    // metadata is populated when records are read.
+    srv.after('READ', ODataServices, async (data) => {
+      const items = Array.isArray(data) ? data : [data];
+      for (const item of items) {
+        if (!item.metadata_json && item.service_base_url && item.service_name) {
+          const { json, version, url } = await fetchMetadata(
+            item.service_base_url,
+            item.service_name
+          );
+          console.log(`Backfilled metadata from ${url}`);
+          item.metadata_json = json;
+          item.odata_version = version;
+          item.last_updated = new Date();
+          await cds.run(
+            UPDATE(ODataServices)
+              .set({
+                metadata_json: json,
+                odata_version: version,
+                last_updated: item.last_updated,
+              })
+              .where({ ID: item.ID })
+          );
+        }
+      }
+    });
 
   // Manual refresh and toggle actions have been removed. Metadata is now
   // fetched automatically during create or update operations.
