@@ -43,25 +43,31 @@ module.exports = srv => {
 
 
   srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
-    if (
-      !req.data.metadata_json &&
-      req.data.service_base_url &&
-      req.data.service_name
-    ) {
-      const { json, version } = await fetchMetadata(
-        req.data.service_base_url,
+    try {
+      if (
+        !req.data.metadata_json &&
+        req.data.service_base_url &&
         req.data.service_name
-      );
-      req.data.metadata_json = json;
-      req.data.odata_version = version;
-    }
-    if (
-      req.data.metadata_json &&
-      !(req.data.service_base_url && req.data.service_name)
-    ) {
-      // metadata_json provided directly
-      const parsed = await parseVersion(req.data.metadata_json);
-      if (parsed) req.data.odata_version = parsed;
+      ) {
+        const { json, version } = await fetchMetadata(
+          req.data.service_base_url,
+          req.data.service_name
+        );
+        req.data.metadata_json = json;
+        req.data.odata_version = version;
+        req.info('Metadata fetched successfully');
+      }
+      if (
+        req.data.metadata_json &&
+        !(req.data.service_base_url && req.data.service_name)
+      ) {
+        // metadata_json provided directly
+        const parsed = await parseVersion(req.data.metadata_json);
+        if (parsed) req.data.odata_version = parsed;
+        req.info('Metadata updated from request');
+      }
+    } catch (e) {
+      req.error(500, e.message);
     }
     req.data.last_updated = new Date();
     if (req.event === 'CREATE' || req.event === 'NEW') {
