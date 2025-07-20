@@ -31,7 +31,7 @@ module.exports = srv => {
 
 
   srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
-    if (req.data.service_url) {
+    if (!req.data.metadata_json && req.data.service_url) {
       const { json, version } = await fetchMetadata(req.data.service_url);
       req.data.metadata_json = json;
       req.data.odata_version = version;
