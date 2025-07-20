@@ -4,6 +4,5 @@ service AdminService {
   @odata.draft.enabled
   entity ODataServices as projection on my.ODataServices {
     action refreshMetadata();
-    action toggleActive();
   };
 }

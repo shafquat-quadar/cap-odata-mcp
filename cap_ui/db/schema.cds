@@ -9,6 +9,11 @@ namespace db;
     TypeName      : 'OData Service',
     Title         : { Value: service_url }
   },
+  Facets: [{
+      $Type : 'UI.ReferenceFacet',
+      Label : 'Details',
+      Target: '@UI.Identification'
+  }],
   LineItem: [
     { Value: service_url,   Label: 'Service URL' },
     { Value: odata_version, Label: 'OData Version' },
