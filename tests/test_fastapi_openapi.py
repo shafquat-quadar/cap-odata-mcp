@@ -17,14 +17,15 @@ def setup_db(path: str):
     conn.execute(
         """CREATE TABLE odata_services (
             id TEXT,
-            service_url TEXT,
+            base_url TEXT,
+            service_name TEXT,
             metadata_json TEXT,
             active INTEGER
         )"""
     )
     conn.execute(
-        "INSERT INTO odata_services VALUES (?,?,?,1)",
-        ("1", "demo", SAMPLE_METADATA),
+        "INSERT INTO odata_services VALUES (?,?,?,?,1)",
+        ("1", "root", "demo", SAMPLE_METADATA),
     )
     conn.commit()
     conn.close()
