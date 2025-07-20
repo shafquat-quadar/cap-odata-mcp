@@ -1,5 +1,5 @@
 const cds = require('@sap/cds');
-const { UPDATE } = cds;
+const { UPDATE } = cds.ql;
 const fetch = require('node-fetch');
 const xml2js = require('xml2js');
 
