@@ -24,7 +24,8 @@ namespace db;
     {
       $Type  : 'UI.DataFieldForAction',
       Action : 'AdminService.ODataServices_refreshMetadata',
-      Label  : 'Refresh Metadata'
+      Label  : 'Refresh Metadata',
+      RequiresContext : true
     }
   ],
   Identification: [
