@@ -11,12 +11,17 @@ module.exports = srv => {
     return crypto.createHash('md5').update(data).digest('hex');
   }
 
-  srv.before(['CREATE', 'UPDATE'], ODataServices, req => {
+  srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
     if (req.data.metadata_json) {
       req.data.version_hash = computeHash(req.data.metadata_json);
+    } else if (req.data.service_url) {
+      const { json, version } = await fetchMetadata(req.data.service_url);
+      req.data.metadata_json = json;
+      req.data.version_hash = computeHash(json);
+      req.data.odata_version = version;
     }
     req.data.last_updated = new Date();
-    if (req.event === 'CREATE' && !req.data.created_at) {
+    if ((req.event === 'CREATE' || req.event === 'NEW') && !req.data.created_at) {
       req.data.created_at = new Date();
     }
   });

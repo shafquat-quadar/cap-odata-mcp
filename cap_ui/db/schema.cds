@@ -15,7 +15,12 @@ namespace db;
     { Value: version_hash,  Label: 'Version Hash' },
     { Value: active,        Label: 'Active' },
     { Value: created_at,    Label: 'Created At' },
-    { Value: last_updated,  Label: 'Last Updated' }
+    { Value: last_updated,  Label: 'Last Updated' },
+    {
+      $Type  : 'UI.DataFieldForAction',
+      Action : 'AdminService.ODataServices_refreshMetadata',
+      Label  : 'Refresh Metadata'
+    }
   ],
   Identification: [
     { Value: version_hash,  Label: 'Version Hash' },
