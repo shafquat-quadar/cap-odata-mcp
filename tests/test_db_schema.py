@@ -8,6 +8,7 @@ def create_schema(conn):
         service_url TEXT NOT NULL,
         metadata_json TEXT,
         version_hash TEXT,
+        odata_version TEXT,
         active INTEGER DEFAULT 1,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -25,6 +26,7 @@ def test_schema_columns():
         "service_url",
         "metadata_json",
         "version_hash",
+        "odata_version",
         "active",
         "created_at",
         "last_updated",
