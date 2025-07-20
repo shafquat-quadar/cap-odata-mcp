@@ -20,8 +20,9 @@ pip install -r fastapi_backend/requirements.txt pytest
 pytest -q
 ```
 
-Create a `.env` file in `fastapi_backend` with `SAP_USER` and `SAP_PASS` to use
-basic authentication when fetching remote metadata.
+Create `.env` files in both `fastapi_backend` and `cap_ui` containing `SAP_USER`
+and `SAP_PASS` to enable basic authentication when retrieving remote
+metadata.
 
 ## Demo OData Service
 
