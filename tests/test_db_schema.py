@@ -5,7 +5,7 @@ def create_schema(conn):
     conn.execute("""
     CREATE TABLE IF NOT EXISTS odata_services (
         id TEXT PRIMARY KEY,
-        base_url TEXT NOT NULL,
+        service_base_url TEXT NOT NULL,
         service_name TEXT NOT NULL,
         metadata_json TEXT,
         odata_version TEXT,
@@ -23,7 +23,7 @@ def test_schema_columns():
     columns = {row[1] for row in cursor.fetchall()}
     expected = {
         "id",
-        "base_url",
+        "service_base_url",
         "service_name",
         "metadata_json",
         "odata_version",

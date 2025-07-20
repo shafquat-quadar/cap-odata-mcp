@@ -15,9 +15,9 @@ namespace db;
       Target: '@UI.Identification'
   }],
   LineItem: [
-    { Value: base_url,      Label: 'Base URL' },
-    { Value: service_name,  Label: 'Service Name' },
-    { Value: odata_version, Label: 'OData Version' },
+    { Value: service_base_url, Label: 'Base URL' },
+    { Value: service_name,     Label: 'Service Name' },
+    { Value: odata_version,    Label: 'OData Version' },
     { Value: active,        Label: 'Active' },
     { Value: created_at,    Label: 'Created At' },
     { Value: last_updated,  Label: 'Last Updated' },
@@ -37,7 +37,7 @@ namespace db;
 entity ODataServices {
   @UI.Hidden: true
   key ID           : UUID;
-  base_url         : String;
+  service_base_url : String;
   service_name     : String;
   @UI.Hidden: true
   metadata_json    : LargeString;

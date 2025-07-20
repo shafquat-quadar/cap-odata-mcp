@@ -17,7 +17,7 @@ def setup_db(path: str):
     conn.execute(
         """CREATE TABLE odata_services (
             id TEXT,
-            base_url TEXT,
+            service_base_url TEXT,
             service_name TEXT,
             metadata_json TEXT,
             active INTEGER

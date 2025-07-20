@@ -2,29 +2,24 @@ const cds = require('@sap/cds');
 const { SELECT, UPDATE } = cds;
 const fetch = require('node-fetch');
 const xml2js = require('xml2js');
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '../.env') });
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 
-function buildServiceUrl(base, name) {
-  return `${base.replace(/\/$/, '')}/${name.replace(/^\//, '')}`;
-}
-
-function authHeader() {
-  const user = process.env.ODATA_USER;
-  const pass = process.env.ODATA_PASSWORD;
+const AUTH_HEADER = (() => {
+  const user = process.env.SAP_USER;
+  const pass = process.env.SAP_PASS;
   if (user && pass) {
     const token = Buffer.from(`${user}:${pass}`).toString('base64');
     return { Authorization: `Basic ${token}` };
   }
   return {};
-}
-
+})();
 async function fetchMetadata(baseUrl, serviceName) {
-  const url = `${buildServiceUrl(baseUrl, serviceName)}/$metadata`;
-  const res = await fetch(url, { headers: authHeader() });
+  const url = `${baseUrl.replace(/\/$/, '')}/${serviceName.replace(/^\//, '')}/$metadata`;
+  const res = await fetch(url, { headers: AUTH_HEADER });
   if (!res.ok) throw new Error(`Failed to fetch metadata: ${res.statusText}`);
   const xml = await res.text();
-  const json = JSON.stringify(await xml2js.parseStringPromise(xml));
+  const obj = await xml2js.parseStringPromise(xml);
+  const json = JSON.stringify(obj);
   const version = await parseVersion(xml);
   return { json, version };
 }
@@ -48,12 +43,22 @@ module.exports = srv => {
 
 
   srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
-    if (!req.data.metadata_json && req.data.base_url && req.data.service_name) {
-      const { json, version } = await fetchMetadata(req.data.base_url, req.data.service_name);
+    if (
+      !req.data.metadata_json &&
+      req.data.service_base_url &&
+      req.data.service_name
+    ) {
+      const { json, version } = await fetchMetadata(
+        req.data.service_base_url,
+        req.data.service_name
+      );
       req.data.metadata_json = json;
       req.data.odata_version = version;
     }
-    if (req.data.metadata_json && !(req.data.base_url && req.data.service_name)) {
+    if (
+      req.data.metadata_json &&
+      !(req.data.service_base_url && req.data.service_name)
+    ) {
       // metadata_json provided directly
       const parsed = await parseVersion(req.data.metadata_json);
       if (parsed) req.data.odata_version = parsed;
@@ -70,7 +75,10 @@ module.exports = srv => {
     const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
     if (!service) return req.error(404, 'Service not found');
     try {
-      const { json, version } = await fetchMetadata(service.base_url, service.service_name);
+      const { json, version } = await fetchMetadata(
+        service.service_base_url,
+        service.service_name
+      );
       await tx.run(
         UPDATE(ODataServices, ID).set({
           metadata_json: json,
@@ -92,7 +100,10 @@ module.exports = srv => {
     const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
     if (!service) return req.error(404, 'Service not found');
     try {
-      const { json, version } = await fetchMetadata(service.base_url, service.service_name);
+      const { json, version } = await fetchMetadata(
+        service.service_base_url,
+        service.service_name
+      );
       await tx.run(
         UPDATE(ODataServices, ID).set({
           metadata_json: json,
