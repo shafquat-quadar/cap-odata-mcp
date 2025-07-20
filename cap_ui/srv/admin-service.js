@@ -2,16 +2,17 @@ const cds = require('@sap/cds');
 const { SELECT, UPDATE } = cds;
 const fetch = require('node-fetch');
 const xml2js = require('xml2js');
-require('dotenv').config();
-
-const authHeader = process.env.BASIC_USER && process.env.BASIC_PASS
-  ? 'Basic ' + Buffer.from(`${process.env.BASIC_USER}:${process.env.BASIC_PASS}`).toString('base64')
-  : null;
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../fastapi_backend/.env') });
 
 async function fetchMetadata(baseUrl, serviceName) {
-  const url = `${baseUrl.replace(/\/$/, '')}/${serviceName.replace(/^\//, '')}/metadata`;
-  const opts = authHeader ? { headers: { Authorization: authHeader } } : {};
-  const res = await fetch(url, opts);
+  const url = `${baseUrl.replace(/\/$/, '')}/${serviceName.replace(/^\//, '')}/$metadata`;
+  const user = process.env.SAP_USER;
+  const pass = process.env.SAP_PASS;
+  const headers = user && pass ? {
+    Authorization: 'Basic ' + Buffer.from(`${user}:${pass}`).toString('base64')
+  } : {};
+  const res = await fetch(url, { headers });
   if (!res.ok) throw new Error(`Failed to fetch metadata: ${res.statusText}`);
   const xml = await res.text();
   const json = JSON.stringify(await xml2js.parseStringPromise(xml));
@@ -43,7 +44,7 @@ module.exports = srv => {
       req.data.metadata_json = json;
       req.data.odata_version = version;
     }
-    if (req.data.metadata_json && (!req.data.base_url || !req.data.service_name)) {
+    if (req.data.metadata_json && !(req.data.base_url && req.data.service_name)) {
       // metadata_json provided directly
       const parsed = await parseVersion(req.data.metadata_json);
       if (parsed) req.data.odata_version = parsed;
@@ -68,7 +69,7 @@ module.exports = srv => {
           last_updated: new Date()
         })
       );
-      req.info('Metadata updated successfully');
+      req.info('Metadata refreshed successfully');
       return tx.run(SELECT.one.from(ODataServices).where({ ID }));
     } catch (e) {
       req.error(500, e.message);
@@ -90,6 +91,7 @@ module.exports = srv => {
           last_updated: new Date()
         })
       );
+      req.info('Service reactivated with latest metadata');
       return tx.run(SELECT.one.from(ODataServices).where({ ID }));
     } catch (e) {
       return req.error(500, e.message);
