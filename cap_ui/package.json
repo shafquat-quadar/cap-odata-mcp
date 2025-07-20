@@ -7,7 +7,18 @@
     "build": "cds build"
   },
   "dependencies": {
-    "@sap/cds": "^7",
+    "@sap/cds": "^8.9.4",
     "sqlite3": "^5"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "database": "../shared.sqlite"
+        }
+      }
+    }
+
   }
 }
