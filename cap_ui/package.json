@@ -1,0 +1,13 @@
+{
+  "name": "cap-ui",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "cds run",
+    "build": "cds build"
+  },
+  "dependencies": {
+    "@sap/cds": "^7",
+    "sqlite3": "^5"
+  }
+}
