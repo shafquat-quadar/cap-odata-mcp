@@ -114,45 +114,32 @@ module.exports = srv => {
   });
 
   srv.on('refreshMetadata', async req => {
-    const ids =
-      (Array.isArray(req.data?.IDs) && req.data.IDs) ||
-      (Array.isArray(req.params) && req.params.map(p => p.ID)) ||
-      [];
-    if (!ids.length && req.params?.[0]?.ID) ids.push(req.params[0].ID);
-    if (!ids.length) return req.error(400, 'No service IDs provided');
+    const ID = req.params?.[0]?.ID || req.data?.ID;
+    if (!ID) return req.error(400, 'No service ID provided');
 
     const tx = srv.tx(req);
-    const results = [];
+    const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
+    if (!service) return req.error(404, 'Service not found');
 
-    for (const ID of ids) {
-      const service = await tx.run(SELECT.one.from(ODataServices).where({ ID }));
-      if (!service) {
-        req.error(`Service not found for ID ${ID}`);
-        results.push({ ID, status: 'failed', message: 'Service not found' });
-        continue;
-      }
-      try {
-        const { json, version, url } = await fetchMetadata(
-          service.service_base_url,
-          service.service_name
-        );
-        req.info(`Fetched metadata from ${url}`);
-        await tx.run(
-          UPDATE(ODataServices, ID).set({
-            metadata_json: json,
-            odata_version: version,
-            last_updated: new Date()
-          })
-        );
-        req.info(`Metadata refreshed for ${service.service_name}`);
-        results.push({ ID, status: 'success' });
-      } catch (e) {
-        req.error(e.message);
-        results.push({ ID, status: 'failed', message: e.message });
-      }
+    try {
+      const { json, version, url } = await fetchMetadata(
+        service.service_base_url,
+        service.service_name
+      );
+      req.info(`Fetched metadata from ${url}`);
+      await tx.run(
+        UPDATE(ODataServices, ID).set({
+          metadata_json: json,
+          odata_version: version,
+          last_updated: new Date()
+        })
+      );
+      req.info(`Metadata refreshed for ${service.service_name}`);
+      return { ID, status: 'success' };
+    } catch (e) {
+      req.error(e.message);
+      return { ID, status: 'failed', message: e.message };
     }
-
-    return results;
   });
 
   srv.on('toggleActive', async req => {
