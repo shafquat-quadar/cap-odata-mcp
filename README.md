@@ -23,7 +23,8 @@ pytest -q
 ## Demo OData Service
 
 For a quick test use the public Northwind OData endpoint. Create a new record in
-the CAP admin UI with the service URL
-`https://services.odata.org/northwind/northwind.svc/` and execute the
-`refreshMetadata` action. The metadata JSON will be stored in the database and
-the `odata_version` column will indicate whether the service is v2 or v4.
+the CAP admin UI with the base URL `https://services.odata.org` and service name
+`northwind/northwind.svc`. Execute the `refreshMetadata` action to fetch the
+metadata (using optional basic authentication credentials from `.env`). The JSON
+metadata will be stored in the database and the `odata_version` column will
+indicate whether the service is v2 or v4.
