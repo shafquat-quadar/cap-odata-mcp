@@ -11,7 +11,16 @@ module.exports = srv => {
     return crypto.createHash('md5').update(data).digest('hex');
   }
 
-  srv.before(['CREATE', 'UPDATE'], ODataServices, req => {
+  srv.before(['CREATE', 'UPDATE'], ODataServices, async req => {
+    if (req.data.service_url && !req.data.metadata_json) {
+      try {
+        const { json, version } = await fetchMetadata(req.data.service_url);
+        req.data.metadata_json = json;
+        req.data.odata_version = version;
+      } catch (e) {
+        req.warn('Failed to fetch metadata');
+      }
+    }
     if (req.data.metadata_json) {
       req.data.version_hash = computeHash(req.data.metadata_json);
     }
@@ -43,6 +52,20 @@ module.exports = srv => {
         metadata_json: json,
         version_hash: versionHash,
         odata_version: version,
+        last_updated: new Date()
+      })
+    );
+    return srvTx.run(SELECT.one.from(ODataServices).where({ ID }));
+  });
+
+  srv.on('toggleActive', async req => {
+    const { ID } = req.params[0];
+    const srvTx = srv.tx(req);
+    const service = await srvTx.run(SELECT.one.from(ODataServices).where({ ID }));
+    if (!service) return req.error(404, 'Service not found');
+    await srvTx.run(
+      UPDATE(ODataServices, ID).set({
+        active: !service.active,
         last_updated: new Date()
       })
     );
