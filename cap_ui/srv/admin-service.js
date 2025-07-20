@@ -1,27 +1,48 @@
 const cds = require('@sap/cds');
 const { SELECT, UPDATE } = cds;
-const crypto = require('crypto');
 const fetch = require('node-fetch');
 const xml2js = require('xml2js');
+
+async function fetchMetadata(serviceUrl) {
+  const res = await fetch(`${serviceUrl.replace(/\/$/, '')}/$metadata`);
+  if (!res.ok) throw new Error(`Failed to fetch metadata: ${res.statusText}`);
+  const xml = await res.text();
+  const json = JSON.stringify(await xml2js.parseStringPromise(xml));
+  const version = await parseVersion(xml);
+  return { json, version };
+}
+
+async function parseVersion(xml) {
+  try {
+    const data = await xml2js.parseStringPromise(xml);
+    const edmx = data['edmx:Edmx'] || {};
+    const ver = edmx.$ ? edmx.$.Version : null;
+    if (ver) {
+      return ver.startsWith('4') ? 'v4' : `v${ver.split('.')[0]}`;
+    }
+  } catch (e) {
+    /* ignore */
+  }
+  return null;
+}
 
 module.exports = srv => {
   const { ODataServices } = srv.entities;
 
-  function computeHash(data) {
-    return crypto.createHash('md5').update(data).digest('hex');
-  }
 
   srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
-    if (req.data.metadata_json) {
-      req.data.version_hash = computeHash(req.data.metadata_json);
-    } else if (req.data.service_url) {
+    if (req.data.service_url) {
       const { json, version } = await fetchMetadata(req.data.service_url);
       req.data.metadata_json = json;
-      req.data.version_hash = computeHash(json);
       req.data.odata_version = version;
     }
+    if (req.data.metadata_json && !req.data.service_url) {
+      // metadata_json provided directly
+      const parsed = await parseVersion(req.data.metadata_json);
+      if (parsed) req.data.odata_version = parsed;
+    }
     req.data.last_updated = new Date();
-    if ((req.event === 'CREATE' || req.event === 'NEW') && !req.data.created_at) {
+    if (req.event === 'CREATE' || req.event === 'NEW') {
       req.data.created_at = new Date();
     }
   });
@@ -33,11 +54,9 @@ module.exports = srv => {
     if (!service) return req.error(404, 'Service not found');
     try {
       const { json, version } = await fetchMetadata(service.service_url);
-      const versionHash = computeHash(json);
       await tx.run(
         UPDATE(ODataServices, ID).set({
           metadata_json: json,
-          version_hash: versionHash,
           odata_version: version,
           last_updated: new Date()
         })
@@ -55,11 +74,9 @@ module.exports = srv => {
     if (!service) return req.error(404, 'Service not found');
     try {
       const { json, version } = await fetchMetadata(service.service_url);
-      const versionHash = computeHash(json);
       await tx.run(
         UPDATE(ODataServices, ID).set({
           metadata_json: json,
-          version_hash: versionHash,
           odata_version: version,
           last_updated: new Date()
         })

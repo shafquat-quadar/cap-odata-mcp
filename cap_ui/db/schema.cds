@@ -17,10 +17,9 @@ namespace db;
   LineItem: [
     { Value: service_url,   Label: 'Service URL' },
     { Value: odata_version, Label: 'OData Version' },
-    { Value: version_hash,  Label: 'Version Hash' },
-    { Value: active,        Label: 'Active' },
-    { Value: created_at,    Label: 'Created At' },
-    { Value: last_updated,  Label: 'Last Updated' },
+      { Value: active,        Label: 'Active' },
+      { Value: created_at,    Label: 'Created At' },
+      { Value: last_updated,  Label: 'Last Updated' },
     {
       $Type  : 'UI.DataFieldForAction',
       Action : 'AdminService.ODataServices_refreshMetadata',
@@ -28,10 +27,9 @@ namespace db;
     }
   ],
   Identification: [
-    { Value: version_hash,  Label: 'Version Hash' },
-    { Value: active,        Label: 'Active' },
-    { Value: created_at,    Label: 'Created At' },
-    { Value: last_updated,  Label: 'Last Updated' },
+      { Value: active,        Label: 'Active' },
+      { Value: created_at,    Label: 'Created At' },
+      { Value: last_updated,  Label: 'Last Updated' },
     { Value: odata_version, Label: 'OData Version' }
   ]
 }
@@ -44,11 +42,10 @@ entity ODataServices {
   @UI.Identification
   @UI.LineItem
   odata_version    : String;
-  @UI.Identification
-  @UI.LineItem
-  version_hash     : String;
   active           : Boolean default true;
+  @Core.Immutable
   created_at       : Timestamp;
+  @Core.Computed
   last_updated     : Timestamp;
 }
 
