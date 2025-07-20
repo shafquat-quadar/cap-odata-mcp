@@ -79,7 +79,7 @@ module.exports = srv => {
   const { ODataServices } = srv.entities;
 
 
-  srv.before(['CREATE', 'UPDATE', 'NEW', 'PATCH'], ODataServices, async req => {
+  srv.before(['CREATE', 'UPDATE', 'NEW'], ODataServices, async req => {
     try {
       if (
         !req.data.metadata_json &&
@@ -113,8 +113,8 @@ module.exports = srv => {
     }
   });
 
-  srv.on('draftActivate', ODataServices, async (req, next) => {
-    const result = await next();
+  srv.after('PATCH', ODataServices, async (data, req) => {
+    console.log('✅ PATCH after fired');
     await applyMetadata(req);
     await cds.run(
       UPDATE(ODataServices)
@@ -123,9 +123,8 @@ module.exports = srv => {
           odata_version: req.data.odata_version,
           last_updated: req.data.last_updated,
         })
-        .where({ ID: result.ID })
+        .where({ ID: data.ID })
     );
-    return result;
   });
 
   // Manual refresh and toggle actions have been removed. Metadata is fetched
