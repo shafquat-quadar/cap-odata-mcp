@@ -20,13 +20,7 @@ namespace db;
     { Value: odata_version,    Label: 'OData Version' },
     { Value: active,        Label: 'Active' },
     { Value: created_at,    Label: 'Created At' },
-    { Value: last_updated,  Label: 'Last Updated' },
-    {
-      $Type  : 'UI.DataFieldForAction',
-      Action : 'AdminService.ODataServices_refreshMetadata',
-      Label  : 'Refresh Metadata',
-      RequiresContext : true
-    }
+    { Value: last_updated,  Label: 'Last Updated' }
   ],
   Identification: [
     { Value: service_base_url, Label: 'Base URL' },
@@ -34,7 +28,14 @@ namespace db;
     { Value: active,           Label: 'Active' },
     { Value: created_at,       Label: 'Created At' },
     { Value: last_updated,     Label: 'Last Updated' },
-    { Value: odata_version,    Label: 'OData Version' }
+    { Value: odata_version,    Label: 'OData Version' },
+    {
+      $Type  : 'UI.DataFieldForAction',
+      Action : 'AdminService.ODataServices_refreshMetadata',
+      Label  : 'Refresh Metadata',
+      Hidden : { $Path: 'IsActiveEntity' },
+      RequiresContext : true
+    }
   ]
 }
 entity ODataServices {
