@@ -1,9 +1,17 @@
-import json
+from xml.etree import ElementTree as ET
 
 
 def parse_metadata(text: str) -> dict:
-    """Parse stored JSON metadata."""
+    """Extract entity set names from stored XML metadata."""
     try:
-        return json.loads(text)
-    except json.JSONDecodeError:
+        root = ET.fromstring(text)
+    except ET.ParseError:
         return {}
+
+    entities = []
+    for es in root.findall('.//{*}EntitySet'):
+        name = es.attrib.get('Name')
+        if name:
+            entities.append({'name': name})
+
+    return {'entities': entities}
