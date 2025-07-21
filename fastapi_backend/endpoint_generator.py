@@ -15,8 +15,9 @@ def _create_list_route(entity_name: str):
 def generate_routers(services: Iterable[dict]) -> Iterable[APIRouter]:
     routers = []
     for svc in services:
-        meta = parse_metadata(svc.get("metadata", ""))
-        router = APIRouter(prefix=f"/{svc['service_name'].strip('/')}")
+        meta = parse_metadata(svc.get("metadata_xml", svc.get("metadata", "")))
+        name = svc.get("name") or svc.get("service_name")
+        router = APIRouter(prefix=f"/{name.strip('/')}")
         for entity in meta.get("entities", []):
             route = _create_list_route(entity["name"])
             router.add_api_route(
@@ -24,7 +25,7 @@ def generate_routers(services: Iterable[dict]) -> Iterable[APIRouter]:
                 route,
                 methods=["GET"],
                 summary=f"List {entity['name']}",
-                tags=[svc["service_name"]],
+                tags=[name],
             )
         routers.append(router)
     return routers

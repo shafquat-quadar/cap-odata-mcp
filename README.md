@@ -3,7 +3,8 @@
 This project demonstrates a minimal integration of a CAP-based Node.js service
 with a Python FastAPI backend. The CAP project owns the SQLite database and
 exposes the `ODataServices` entity, while the FastAPI app reads the same
-database to generate REST endpoints and an OpenAPI specification.
+database to generate REST endpoints and an OpenAPI specification. See
+`fastapi_backend/README.md` for details on running the FastAPI MCP bridge.
 
 ```
 📦 cap_ui/           # CAP Project (Node.js)

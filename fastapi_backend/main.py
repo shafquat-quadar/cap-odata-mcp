@@ -1,5 +1,7 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from fastapi.openapi.utils import get_openapi
 from dotenv import load_dotenv
 
 from .metadata_store import MetadataStore
@@ -12,8 +14,31 @@ def create_app(db_path: str = "../shared.sqlite") -> FastAPI:
     store = MetadataStore(db_path)
     app = FastAPI()
     services = store.get_active_services()
+    service_map = {svc.get("name") or svc.get("service_name"): svc for svc in services}
     for router in generate_routers(services):
         app.include_router(router)
+
+    @app.get("/tools/{service_name}")
+    async def tool_spec(service_name: str):
+        svc = service_map.get(service_name)
+        if not svc:
+            raise HTTPException(status_code=404, detail="Service not found")
+        temp = FastAPI()
+        for router in generate_routers([svc]):
+            temp.include_router(router)
+        schema = get_openapi(
+            title=service_name,
+            version="1.0.0",
+            description=svc.get("description") or "",
+            routes=temp.routes,
+        )
+        return JSONResponse(schema)
+
+    @app.get("/invoke/{service_name}/{entity}")
+    async def invoke(service_name: str, entity: str, request: Request):
+        if service_name not in service_map:
+            raise HTTPException(status_code=404, detail="Service not found")
+        return {"service": service_name, "entity": entity, "query": dict(request.query_params)}
 
     app.openapi = lambda: custom_openapi(app)
     return app
