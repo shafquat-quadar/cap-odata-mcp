@@ -8,9 +8,19 @@ from .metadata_store import MetadataStore
 from .endpoint_generator import generate_routers
 from .openapi_customizer import custom_openapi
 
+# Load environment variables from `.env` once during import so
+# `os.getenv` picks up values before the FastAPI application is created.
+ENV_PATH = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(dotenv_path=ENV_PATH)
 
-def create_app(db_path: str = "../shared.sqlite") -> FastAPI:
-    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"))
+# Default to the shared database in the repository root, but use an
+# absolute path so the app can run from any location.
+DEFAULT_DB_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "shared.sqlite")
+)
+
+
+def create_app(db_path: str = DEFAULT_DB_PATH) -> FastAPI:
     store = MetadataStore(db_path)
     app = FastAPI()
     services = store.get_active_services()
@@ -44,4 +54,5 @@ def create_app(db_path: str = "../shared.sqlite") -> FastAPI:
     return app
 
 
-app = create_app(os.getenv("DB_PATH", "../shared.sqlite"))
+DB_PATH = os.getenv("DB_PATH", DEFAULT_DB_PATH)
+app = create_app(DB_PATH)

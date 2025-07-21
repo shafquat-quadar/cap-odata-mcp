@@ -15,6 +15,13 @@ pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
+Create a `.env` file in this directory and set `DB_PATH` to the absolute
+location of the shared SQLite database. Example:
+
+```env
+DB_PATH=/absolute/path/to/shared.sqlite
+```
+
 ### Endpoints
 
 - `/tools/{service_name}` - return an OpenAPI JSON spec for a single service
