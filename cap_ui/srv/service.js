@@ -1,5 +1,4 @@
 const cds = require('@sap/cds');
-const { UPDATE } = cds.ql;
 const fetch = require('node-fetch');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
@@ -37,50 +36,21 @@ async function fetchMetadata(baseUrl, serviceName) {
   return { xml };
 }
 
-/**
- * Update metadata for a single item if required.
- */
-async function metadataUpdate(item, tx, ODataServices) {
-  if (!item) return;
-  if (item.metadata) return;
-  if (!(item.service_base_url && item.service_name)) return;
-
-  const { xml } = await fetchMetadata(item.service_base_url, item.service_name);
-  item.metadata = xml;
-  item.last_updated = new Date();
-  console.log(`Metadata updated for ${item.ID}`);
-  await tx.run(
-    UPDATE(ODataServices)
-      .set({ metadata: xml, last_updated: item.last_updated })
-      .where({ ID: item.ID })
-  );
-}
 
 module.exports = srv => {
   const { ODataServices } = srv.entities;
 
-  srv.after('READ', ODataServices, async (data, req) => {
-    console.log('READ triggered');
-    const tx = cds.transaction(req);
-    const items = Array.isArray(data) ? data : [data];
-    for (const item of items) {
-      await metadataUpdate(item, tx, ODataServices);
-    }
-  });
+  srv.before(['CREATE', 'UPDATE'], ODataServices, async req => {
+    const data = req.data;
+    if (!data) return;
+    if (data.metadata) return;
+    if (!(data.service_base_url && data.service_name)) return;
 
-  srv.after('CREATE', ODataServices, async (data, req) => {
-    console.log('CREATE after triggered');
-    const tx = cds.transaction(req);
-    await metadataUpdate(data, tx, ODataServices);
-  });
-
-  srv.after('UPDATE', ODataServices, async (data, req) => {
-    console.log('UPDATE after triggered');
-    const tx = cds.transaction(req);
-    await metadataUpdate(data, tx, ODataServices);
+    const { xml } = await fetchMetadata(data.service_base_url, data.service_name);
+    data.metadata = xml;
+    data.last_updated = new Date();
   });
 };
 
 // Export for tests
 module.exports.fetchMetadata = fetchMetadata;
-module.exports.metadataUpdate = metadataUpdate;
