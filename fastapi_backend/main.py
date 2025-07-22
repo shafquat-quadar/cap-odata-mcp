@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse
 from fastapi.openapi.utils import get_openapi
 from dotenv import load_dotenv
 
+from .odata_invoker import call_odata_service
+
 from .metadata_store import MetadataStore
 from .endpoint_generator import generate_routers
 from .openapi_customizer import custom_openapi
@@ -46,9 +48,17 @@ def create_app(db_path: str = DEFAULT_DB_PATH) -> FastAPI:
 
     @app.get("/invoke/{service_name}/{entity}")
     async def invoke(service_name: str, entity: str, request: Request):
-        if service_name not in service_map:
+        svc = service_map.get(service_name)
+        if not svc:
             raise HTTPException(status_code=404, detail="Service not found")
-        return {"service": service_name, "entity": entity, "query": dict(request.query_params)}
+
+        params = dict(request.query_params)
+        target_service = svc.get("service_name") or svc.get("name")
+        try:
+            data = await call_odata_service(target_service, entity, params)
+        except HTTPException as exc:
+            raise HTTPException(status_code=500, detail=exc.detail)
+        return JSONResponse(data)
 
     app.openapi = lambda: custom_openapi(app)
     return app
