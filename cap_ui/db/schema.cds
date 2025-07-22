@@ -40,7 +40,7 @@ entity ODataServices {
   @UI.Hidden: true
   metadata         : LargeString;
   @UI.Identification
-  description      : String;
+  description      : LargeString;
   active           : Boolean default true;
   @Core.Computed
   @cds.on.insert : $now
