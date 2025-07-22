@@ -2,7 +2,8 @@
 
 This backend reads OData service metadata from the shared SQLite database and
 exposes dynamic endpoints for each active service. The resulting OpenAPI
-definitions can be consumed directly by LLM agents.
+definitions conform to version **3.1** and can be consumed directly by LLM
+agents.
 
 ## Running
 

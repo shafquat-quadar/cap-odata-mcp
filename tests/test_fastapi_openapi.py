@@ -49,4 +49,4 @@ def test_openapi_contains_entity_path():
         from fastapi_backend.main import app
         client = TestClient(app)
         schema = client.get("/openapi.json").json()
-        assert "/demo/Products" in schema["paths"]
+        assert "/invoke/demo/Products" in schema["paths"]
